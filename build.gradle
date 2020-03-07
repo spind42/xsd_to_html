@@ -1,0 +1,85 @@
+import org.gradle.api.artifacts.*
+
+apply plugin: 'base' // To add "clean" task to the root project.
+
+//plugins {
+//  id "com.github.ramonwirsch.FopRenderer" version "0.1.16"
+//}
+
+subprojects {
+    apply from: rootProject.file('common.gradle')
+}
+
+//task mergedJavadoc(type: Javadoc, description: 'Creates Javadoc from all the projects.') {
+//    title = 'All modules'
+//    destinationDir = new File(project.buildDir, 'merged-javadoc')
+//
+//    // Note: The closures below are executed lazily.
+//    source {
+//       subprojects*.sourceSets*.main*.allSource
+//    }
+//    classpath.from {
+//        subprojects*.configurations*.compile*.copyRecursive({ !(it instanceof ProjectDependency); })*.resolve()
+//    }
+//}
+
+
+apply plugin: 'java'
+
+//dependencies {
+//  runtime group: 'org.apache.xmlgraphics', name: 'fop', version: '2.2'
+//  runtime group: 'org.apache.xmlgraphics',  name: 'fop-pdf-images', version: '2.2'
+//}
+
+sourceSets {
+    main {
+        resources {
+            srcDir 'src/main/xsl'
+            srcDir 'src/main/forms'
+        }
+        
+    }
+}
+
+repositories { mavenCentral() }
+
+//task getDeps(type: Copy) {
+//  from sourceSets.main.runtimeClasspath
+//  into 'build/runtime/'
+//  rename '(.*)-[0-9]+\\..*.jar', '$1.jar' //stripping version number
+//}
+
+
+task convert(type: JavaExec) {
+  
+  //println "path"
+  //println project.projectDir
+  
+  def infile = "${project.projectDir}/src/main/forms/lebenslauf.xml"
+  def style = "${project.projectDir}/src/main/xsl/lebenslauf.xsl"
+  def outfile = "${buildDir}/lebenslauf.pdf"  
+  
+  
+  inputs.files(infile)
+  inputs.files(style)
+  
+  //outputs.dir("$buildDir/out") //TODO: generate first!
+  
+  
+  
+ 
+  //classpath "${buildDir}/runtime/"
+  main="-jar"; 
+  args "${buildDir}/runtime/fop.jar" //, "-pdf", outfile, "-xml", infile, "-xsl", style]
+  args "-pdf"
+  args outfile
+  args "-xml"
+  args infile
+  args "-xsl"
+  args style
+  workingDir "${buildDir}/runtime/"
+  //    main = "org.apache.fop.cli.Main"
+  
+}
+//convert.dependsOn getDeps
+
